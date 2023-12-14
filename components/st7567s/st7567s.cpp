@@ -130,6 +130,9 @@ void ST7567S::display_init_() {
     command_(ST7567_POWER_CTL | 0x4);
     command_(ST7567_POWER_CTL | 0x6);
     command_(ST7567_POWER_CTL | 0x7);
+    //********Adjust display brightness********
+    command_(0x25); // 0x20-0x27 is the internal Rb/Ra resistance
+                    // adjustment setting of V5 voltage RR=4.5V
     // command_(ST7567_RESISTOR_RATIO | 0x6);
     command_(ST7567_BOOSTER_ON);
     command_(ST7567_REGULATOR_ON);
