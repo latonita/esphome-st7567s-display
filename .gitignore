@@ -1,0 +1,9 @@
+/.esphome/**
+/env/**
+/secrets.yaml
+**/__pycache__
+/.vscode/**
+/fonts/**
+
+/*.yaml
+/*.yml
