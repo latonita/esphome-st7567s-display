@@ -51,6 +51,14 @@ static const char *const TAG = "st7567s";
 
 void ST7567S::setup() {
     ESP_LOGCONFIG(TAG, "Setting up ST7567S LCD Display...");
+
+    auto err = this->write(nullptr, 0);
+    if (err != i2c::ERROR_OK) {
+        this->error_code_ = COMMUNICATION_FAILED;
+        this->mark_failed();
+        return;
+    }
+
     dump_config();
     init_internal_(get_buffer_length_());
     display_init_();
@@ -62,6 +70,10 @@ void ST7567S::dump_config() {
     ESP_LOGCONFIG(TAG, "  Width: %d", width_);
     LOG_I2C_DEVICE(this);
     LOG_UPDATE_INTERVAL(this);
+
+    if (this->error_code_ == COMMUNICATION_FAILED) {
+        ESP_LOGE(TAG, "Communication with ST7567S failed!");
+    }
 }
 
 float ST7567S::get_setup_priority() const { return setup_priority::PROCESSOR; }
@@ -92,7 +104,6 @@ size_t ST7567S::get_buffer_length_() { return size_t(get_width_internal()) * siz
 
 void ST7567S::command_(uint8_t value) { write_register(0x00, &value, 1, true); }
 
-#define POINTS_AT_ONCE 64
 void HOT ST7567S::write_display_data() {
     command_(ST7567_SCAN_START_LINE);
 
@@ -101,10 +112,10 @@ void HOT ST7567S::write_display_data() {
         command_(ST7567_COL_ADDR_H);    // Set MSB Column address
         command_(ST7567_COL_ADDR_L);    // Set LSB Column address
 
-        // I2C bus: for some reason it doesn't work when sending 128 bytes at a time, sending 64
-        for (uint8_t x = 0; x < (uint8_t)get_width_internal(); x += POINTS_AT_ONCE) {
+        static const size_t block_size = 64;
+        for (uint8_t x = 0; x < (uint8_t)get_width_internal(); x += block_size) {
             write_register(ST7567_SCAN_START_LINE, &buffer_[y * get_width_internal() + x],
-                           get_width_internal() - x > POINTS_AT_ONCE ? POINTS_AT_ONCE : get_width_internal() - x, true);
+                           get_width_internal() - x > block_size ? block_size : get_width_internal() - x, true);
         }
 
         App.feed_wdt();
@@ -114,9 +125,7 @@ void HOT ST7567S::write_display_data() {
 void ST7567S::fill(Color color) { memset(buffer_, color.is_on() ? 0xFF : 0x00, get_buffer_length_()); }
 
 void ST7567S::clear(bool invcolor) {
-    esphome::Color c;
-    c.raw_32 = invcolor ? 0xFFFFFF : 0x00;
-    fill(c);
+    fill(Color{.raw32 = (invcolor ? 1u : 0u)});
     write_display_data();
 }
 

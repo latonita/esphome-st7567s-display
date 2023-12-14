@@ -38,6 +38,7 @@ class ST7567S : public PollingComponent, public display::DisplayBuffer, public i
     void draw_absolute_pixel_internal(int x, int y, Color color) override;
 
     int16_t width_ = 128, height_ = 64;
+    enum ErrorCode { NONE = 0, COMMUNICATION_FAILED } error_code_{NONE};
 };
 
 } // namespace st7567s
