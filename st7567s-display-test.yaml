@@ -1,0 +1,30 @@
+esphome:
+  name: st7567s-display-test-8266
+
+external_components:
+  source: github://latonita/esphome-st7567s-display@main
+  components: [st7567s]
+
+esp8266:
+  board: nodemcuv2
+
+logger:
+    level: WARN
+
+font:
+ - file: "gfonts://Roboto"
+   id: font_roboto
+   size: 24
+
+i2c:
+  sda: D2
+  scl: D1
+  scan: true
+
+display:
+ - platform: st7567s
+   address: 0x3F
+   update_interval: 1s
+   lambda: |-
+     it.print(0, 0, id(font_roboto), "Hello World!");
+
