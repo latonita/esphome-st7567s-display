@@ -3,47 +3,46 @@
 #include "esphome/core/application.h"
 #include "esphome/core/log.h"
 
-// ST7567 Commands
-#define ST7567_BOOSTER_ON 0x2C     // internal power supply on
-#define ST7567_REGULATOR_ON 0x2E   // internal power supply on
-#define ST7567_POWER_ON 0x2F       // internal power supply on
-#define ST7567_POWER_CTL 0x28      // internal power supply off
-#define ST7567_CONTRAST 0x80       // 0x80 + (0..31)
-#define ST7567_SEG_NORMAL 0xA0     // SEG remap normal
-#define ST7567_SEG_REMAP 0xA1      // SEG remap reverse (flip horizontal)
-#define ST7567_DISPLAY_NORMAL 0xA4 // display ram content
-#define ST7567_DISPLAY_TEST 0xA5   // all pixels on
-#define ST7567_INVERT_OFF 0xA6     // not inverted
-#define ST7567_INVERT_ON 0xA7      // inverted
-#define ST7567_DISPLAY_ON 0XAF     // display on
-#define ST7567_DISPLAY_OFF 0XAE    // display off
-#define ST7567_STATIC_OFF 0xAC
-#define ST7567_STATIC_ON 0xAD
-#define ST7567_SCAN_START_LINE 0x40 // scrolling 0x40 + (0..63)
-#define ST7567_COM_NORMAL 0xC0      // COM remap normal
-#define ST7567_COM_REMAP 0xC8       // COM remap reverse (flip vertical)
-#define ST7567_SW_RESET 0xE2        // connect RST pin to GND and rely on software reset
-#define ST7567_NOP 0xE3             // no operation
-#define ST7567_TEST 0xF0
+static const uint8_t ST7567_BOOSTER_ON = 0x2C;     // internal power supply on
+static const uint8_t ST7567_REGULATOR_ON = 0x2E;   // internal power supply on
+static const uint8_t ST7567_POWER_ON = 0x2F;       // internal power supply on
+static const uint8_t ST7567_POWER_CTL = 0x28;      // internal power supply off
+static const uint8_t ST7567_CONTRAST = 0x80;       // 0x80 + (0..31)
+static const uint8_t ST7567_SEG_NORMAL = 0xA0;     // SEG remap normal
+static const uint8_t ST7567_SEG_REMAP = 0xA1;      // SEG remap reverse (flip horizontal)
+static const uint8_t ST7567_DISPLAY_NORMAL = 0xA4; // display ram content
+static const uint8_t ST7567_DISPLAY_TEST = 0xA5;   // all pixels on
+static const uint8_t ST7567_INVERT_OFF = 0xA6;     // not inverted
+static const uint8_t ST7567_INVERT_ON = 0xA7;      // inverted
+static const uint8_t ST7567_DISPLAY_ON = 0xAF;     // display on
+static const uint8_t ST7567_DISPLAY_OFF = 0xAE;    // display off
+static const uint8_t ST7567_STATIC_OFF = 0xAC;
+static const uint8_t ST7567_STATIC_ON = 0xAD;
+static const uint8_t ST7567_SCAN_START_LINE = 0x40; // scrolling = 0x40 + (0..63)
+static const uint8_t ST7567_COM_NORMAL = 0xC0;      // COM remap normal
+static const uint8_t ST7567_COM_REMAP = 0xC8;       // COM remap reverse (flip vertical)
+static const uint8_t ST7567_SW_RESET = 0xE2;        // connect RST pin to GND and rely on software reset
+static const uint8_t ST7567_NOP = 0xE3;             // no operation
+static const uint8_t ST7567_TEST = 0xF0;
 
-#define ST7567_COL_ADDR_H 0x10 // x pos (0..95) 4 MSB
-#define ST7567_COL_ADDR_L 0x00 // x pos (0..95) 4 LSB
-#define ST7567_PAGE_ADDR 0xB0  // y pos, 8.5 rows (0..8)
-#define ST7567_RMW 0xE0
-#define ST7567_RMW_CLEAR 0xEE
+static const uint8_t ST7567_COL_ADDR_H = 0x10; // x pos (0..95) 4 MSB
+static const uint8_t ST7567_COL_ADDR_L = 0x00; // x pos (0..95) 4 LSB
+static const uint8_t ST7567_PAGE_ADDR = 0xB0;  // y pos, 8.5 rows (0..8)
+static const uint8_t ST7567_RMW = 0xE0;
+static const uint8_t ST7567_RMW_CLEAR = 0xEE;
 
-#define ST7567_BIAS_9 0xA2
-#define ST7567_BIAS_7 0xA3
+static const uint8_t ST7567_BIAS_9 = 0xA2;
+static const uint8_t ST7567_BIAS_7 = 0xA3;
 
-#define ST7567_VOLUME_FIRST 0x81
-#define ST7567_VOLUME_SECOND 0x00
+static const uint8_t ST7567_VOLUME_FIRST = 0x81;
+static const uint8_t ST7567_VOLUME_SECOND = 0x00;
 
-#define ST7567_RESISTOR_RATIO 0x20
-#define ST7567_STATIC_REG 0x0
-#define ST7567_BOOSTER_FIRST 0xF8
-#define ST7567_BOOSTER_234 0
-#define ST7567_BOOSTER_5 1
-#define ST7567_BOOSTER_6 3
+static const uint8_t ST7567_RESISTOR_RATIO = 0x20;
+static const uint8_t ST7567_STATIC_REG = 0x0;
+static const uint8_t ST7567_BOOSTER_FIRST = 0xF8;
+static const uint8_t ST7567_BOOSTER_234 = 0;
+static const uint8_t ST7567_BOOSTER_5 = 1;
+static const uint8_t ST7567_BOOSTER_6 = 3;
 
 namespace esphome {
 namespace st7567s {
