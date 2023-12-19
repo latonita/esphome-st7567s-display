@@ -1,6 +1,8 @@
 # ST7567 I2C/IIC display (ST7567S, GM12864-59N) component for ESPHome
 https://github.com/latonita/esphome-st7567s-display/
 
+*This is temporary soltion as of 2023/12 until this driver included into Esphome base components (https://github.com/esphome/esphome/pull/5952).*
+
 This is ESPHome component to support I2C display from Aliexpress/Ebay.
 Sellers often sell it as: 12864 IIC 4P LCD Module 128X64 I2C ST7567S COG Graphic Display Screen Board LCM Panel 128x64 Dot Matrix Screen for Arduino
 
