@@ -3,7 +3,7 @@ esphome:
 
 external_components:
   source: github://latonita/esphome-st7567s-display@main
-  components: [st7567s]
+  components: [st7567_base, st7567_i2c]
 
 esp8266:
   board: nodemcuv2
@@ -13,7 +13,7 @@ logger:
 
 font:
  - file: "gfonts://Roboto"
-   id: font_roboto
+   id: my_font
    size: 24
 
 i2c:
@@ -21,10 +21,19 @@ i2c:
   scl: D1
   scan: true
 
+    # Example minimal configuration entry
+i2c:
+  sda: D1
+  scl: D2
+
 display:
- - platform: st7567s
-   address: 0x3F
-   update_interval: 1s
-   lambda: |-
-     it.print(0, 0, id(font_roboto), "Hello World!");
+  - platform: st7567_i2c
+    id: my_display
+    lambda: |-
+      it.print(0, 0, id(my_font), "Hello World!");
+      
+interval:
+  - interval: 1h
+    then:
+      - lambda: id(my_display).request_refresh();
 
